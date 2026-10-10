@@ -1,0 +1,302 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOVA AI</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;background:#090911;color:#f5f3ff;
+  font-family:Tahoma,Arial,sans-serif;min-height:100vh
+}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+a{color:#c4b5fd;text-decoration:none}
+header{
+  height:70px;padding:0 25px;display:flex;align-items:center;
+  justify-content:space-between;border-bottom:1px solid #29293d;
+  background:#0d0d16
+}
+.logo{font-size:25px;font-weight:bold}
+.logo span{color:#a78bfa}
+.btn{
+  border:0;border-radius:11px;padding:11px 17px;
+  background:linear-gradient(110deg,#8057ee,#bd75f6);
+  color:white;font-weight:bold
+}
+.secondary{background:#191927;border:1px solid #29293d}
+.layout{display:grid;grid-template-columns:235px 1fr;min-height:calc(100vh - 70px)}
+aside{background:#0d0d16;padding:20px 14px;border-left:1px solid #29293d}
+main{max-width:1100px;width:100%;margin:auto;padding:25px}
+.side-button,.tool{
+  width:100%;text-align:right;background:transparent;
+  border:1px solid #29293d;color:white;border-radius:12px;
+  padding:13px;margin-bottom:10px
+}
+.side-button:hover,.tool:hover,.tool.active{background:#211a35;border-color:#a78bfa}
+.hero{text-align:center;padding:20px 0}
+.orb{
+  width:65px;height:65px;border-radius:20px;margin:auto;
+  display:grid;place-items:center;font-size:32px;color:#e9d5ff;
+  background:radial-gradient(circle at top left,#62428e,#171323);
+  border:1px solid #8b5cf655
+}
+h1{font-size:clamp(27px,4vw,43px);line-height:1.5}
+.gradient{
+  background:linear-gradient(90deg,#c4b5fd,#f0abfc);
+  color:transparent;background-clip:text
+}
+.muted{color:#9b99b5;line-height:1.9}
+.tools{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:25px 0}
+.tool{margin:0;padding:17px 12px;min-height:110px}
+.tool .icon{display:block;color:#c4b5fd;font-size:25px;margin-bottom:12px}
+.tool small{display:block;color:#9b99b5;margin-top:8px}
+.panel{border:1px solid #29293d;background:#11111c;border-radius:16px;overflow:hidden}
+.panel-head{padding:17px;border-bottom:1px solid #29293d}
+.panel-head h2{font-size:18px;margin:0}
+.messages{padding:18px;min-height:200px;max-height:450px;overflow-y:auto}
+.msg{padding:13px 15px;margin-bottom:12px;border-radius:12px;line-height:1.9;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.ai{background:#191927;border:1px solid #29293d}
+.msg.user{background:#29213e;width:fit-content;max-width:90%;margin-right:auto}
+.composer{border-top:1px solid #29293d;padding:14px}
+textarea,input{
+  width:100%;background:#0b0b14;color:white;
+  border:1px solid #29293d;border-radius:10px;padding:13px;outline:none
+}
+textarea{resize:vertical;line-height:1.8}
+textarea:focus,input:focus{border-color:#a78bfa}
+.bottom{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px}
+.bottom small{color:#9b99b5}
+.section{padding:20px}
+.section form{display:grid;gap:13px}
+.hidden{display:none!important}
+.result{white-space:pre-wrap;line-height:1.9;overflow-wrap:anywhere;margin-top:16px}
+.result img{display:block;max-width:100%;width:500px;border-radius:13px}
+.auth{max-width:420px;margin:45px auto;padding:25px;background:#11111c;border:1px solid #29293d;border-radius:16px}
+.auth h2{text-align:center}
+.auth form{display:grid;gap:12px}
+footer{text-align:center;padding:25px;color:#77758d;font-size:12px}
+@media(max-width:800px){
+ .layout{grid-template-columns:1fr}
+ aside{border-left:0;border-bottom:1px solid #29293d;padding:10px}
+ aside .side-button{width:auto;margin:3px}
+ .tools{grid-template-columns:repeat(2,minmax(0,1fr))}
+ main{padding:15px 10px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="#" onclick="home();return false">✦ NOVA <span>AI</span></a>
+  <button class="btn secondary" onclick="showAuth()">تسجيل الدخول</button>
+</header>
+
+<div id="app">
+  <div class="layout">
+    <aside>
+      <button class="btn" style="width:100%;margin-bottom:18px" onclick="newChat()">＋ محادثة جديدة</button>
+      <button class="side-button" onclick="selectTool('chat')">✧ المحادثة الذكية</button>
+      <button class="side-button" onclick="selectTool('image')">▧ توليد الصور</button>
+      <button class="side-button" onclick="selectTool('pdf')">▤ تحليل PDF</button>
+      <button class="side-button" onclick="selectTool('code')">&lt;/&gt; مساعد البرمجة</button>
+      <p class="muted" style="font-size:12px;margin-top:30px">NOVA AI · مساعدك الذكي</p>
+    </aside>
+
+    <main>
+      <section class="hero">
+        <div class="orb">✦</div>
+        <h1>أهلاً بك في <span class="gradient">NOVA AI</span></h1>
+        <p class="muted">كل أدوات الذكاء الاصطناعي في مكان واحد.</p>
+      </section>
+
+      <div class="tools">
+        <button class="tool active" data-tool="chat" onclick="selectTool('chat')">
+          <span class="icon">✧</span>محادثة ذكية<small>اسأل أي سؤال</small>
+        </button>
+        <button class="tool" data-tool="image" onclick="selectTool('image')">
+          <span class="icon">▧</span>توليد الصور<small>أنشئ صوراً إبداعية</small>
+        </button>
+        <button class="tool" data-tool="pdf" onclick="selectTool('pdf')">
+          <span class="icon">▤</span>تحليل PDF<small>حلّل مستنداتك</small>
+        </button>
+        <button class="tool" data-tool="code" onclick="selectTool('code')">
+          <span class="icon">&lt;/&gt;</span>مساعد البرمجة<small>اكتب الأكواد</small>
+        </button>
+      </div>
+
+      <section class="panel" id="chatPanel">
+        <div class="panel-head">
+          <h2 id="panelTitle">✧ المحادثة الذكية</h2>
+          <p class="muted" style="font-size:12px;margin-bottom:0">كيف أقدر أساعدك اليوم؟</p>
+        </div>
+        <div class="messages" id="messages">
+          <div class="msg ai">أهلاً بك في NOVA AI! ✨ اكتب سؤالك للبدء.</div>
+        </div>
+        <form class="composer" id="chatForm">
+          <textarea id="prompt" rows="2" maxlength="12000" placeholder="اكتب رسالتك هنا..." required></textarea>
+          <div class="bottom">
+            <small>مساعدك الذكي</small>
+            <button class="btn" id="sendBtn">إرسال ↑</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel section hidden" id="imagePanel">
+        <h2>▧ توليد الصور</h2>
+        <p class="muted">اكتب وصف الصورة التي تريدها.</p>
+        <form id="imageForm">
+          <textarea id="imagePrompt" rows="3" placeholder="مدينة مستقبلية بأضواء بنفسجية..." required></textarea>
+          <button class="btn">إنشاء الصورة</button>
+        </form>
+        <div class="result" id="imageResult"></div>
+      </section>
+
+      <section class="panel section hidden" id="pdfPanel">
+        <h2>▤ تحليل PDF</h2>
+        <p class="muted">اختر ملف PDF ثم اكتب سؤالك عنه.</p>
+        <form id="pdfForm">
+          <input type="file" id="pdfFile" accept=".pdf,application/pdf" required>
+          <textarea id="pdfQuestion" rows="2" placeholder="لخّص الملف..."></textarea>
+          <button class="btn">تحليل الملف</button>
+        </form>
+        <div class="result" id="pdfResult"></div>
+      </section>
+
+      <section class="panel section hidden" id="codePanel">
+        <h2>&lt;/&gt; مساعد البرمجة</h2>
+        <p class="muted">صف البرنامج الذي تريد كتابته.</p>
+        <form id="codeForm">
+          <textarea id="codePrompt" rows="4" placeholder="اكتب لي برنامجاً بلغة Python..." required></textarea>
+          <button class="btn">إرسال للمساعد</button>
+        </form>
+      </section>
+
+      <div id="notice" class="muted" style="margin-top:15px"></div>
+    </main>
+  </div>
+</div>
+
+<div id="authPanel" class="auth hidden">
+  <h2>✦ NOVA <span class="gradient">AI</span></h2>
+  <p class="muted">هذه واجهة تجريبية لتسجيل الدخول.</p>
+  <form onsubmit="event.preventDefault();alert('تسجيل الحساب الحقيقي يحتاج إلى خادم خلفي.');">
+    <label>البريد الإلكتروني</label>
+    <input type="email" placeholder="you@example.com" required>
+    <label>كلمة المرور</label>
+    <input type="password" minlength="8" placeholder="كلمة المرور" required>
+    <button class="btn">دخول تجريبي</button>
+    <button type="button" class="btn secondary" onclick="home()">العودة للرئيسية</button>
+  </form>
+</div>
+
+<footer>NOVA AI · منصتك الذكية</footer>
+
+<script>
+let currentTool = 'chat';
+let busy = false;
+
+function selectTool(name){
+  currentTool = name;
+  document.querySelectorAll('[data-tool]').forEach(el=>{
+    el.classList.toggle('active',el.dataset.tool===name);
+  });
+  ['chat','image','pdf','code'].forEach(tool=>{
+    const panel=document.getElementById(tool+'Panel');
+    if(panel) panel.classList.toggle('hidden',tool!==name);
+  });
+  const titles={
+    chat:'✧ المحادثة الذكية',
+    image:'▧ توليد الصور',
+    pdf:'▤ تحليل PDF',
+    code:'</> مساعد البرمجة'
+  };
+  document.getElementById('panelTitle').textContent=titles[name];
+  document.getElementById('notice').textContent='';
+}
+
+function addMessage(type,text){
+  const el=document.createElement('div');
+  el.className='msg '+type;
+  el.textContent=text;
+  document.getElementById('messages').appendChild(el);
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+  return el;
+}
+
+function newChat(){
+  document.getElementById('messages').replaceChildren();
+  addMessage('ai','بدأنا محادثة جديدة! ✨ كيف أساعدك؟');
+  document.getElementById('prompt').value='';
+  selectTool('chat');
+}
+
+function home(){
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('authPanel').classList.add('hidden');
+}
+
+function showAuth(){
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('authPanel').classList.remove('hidden');
+}
+
+document.getElementById('chatForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(busy)return;
+
+  const input=document.getElementById('prompt');
+  const prompt=input.value.trim();
+  if(!prompt)return;
+
+  input.value='';
+  addMessage('user',prompt);
+  const pending=addMessage('ai','جارٍ إرسال الطلب...');
+  busy=true;
+  document.getElementById('sendBtn').disabled=true;
+
+  try{
+    const response=await fetch('/api/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message:prompt})
+    });
+    const data=await response.json();
+    if(!response.ok)throw new Error(data.error||'تعذر الاتصال بالخادم.');
+    pending.textContent=data.answer;
+  }catch(error){
+    pending.textContent='لم يتم الاتصال بخادم الذكاء الاصطناعي. إذا فتحت الصفحة مباشرة من جهازك، اربطها بخادم Python أو API.';
+  }finally{
+    busy=false;
+    document.getElementById('sendBtn').disabled=false;
+  }
+});
+
+document.getElementById('imageForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const box=document.getElementById('imageResult');
+  box.textContent='توليد الصور يحتاج إلى ربط API أو خادم خلفي.';
+});
+
+document.getElementById('pdfForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const box=document.getElementById('pdfResult');
+  const file=document.getElementById('pdfFile').files[0];
+  if(!file)return;
+  if(file.size>10*1024*1024){box.textContent='الحد الأقصى 10 ميغابايت.';return;}
+  box.textContent='تحليل محتوى PDF يحتاج إلى JavaScript متخصص أو خادم خلفي متصل بالذكاء الاصطناعي.';
+});
+
+document.getElementById('codeForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  document.getElementById('prompt').value=
+    'ساعدني في البرمجة واكتب الكود المطلوب مع شرحه:\n'+
+    document.getElementById('codePrompt').value;
+  selectTool('chat');
+  document.getElementById('prompt').focus();
+});
+</script>
+</body>
+</html>
